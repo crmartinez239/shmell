@@ -41,29 +41,3 @@ func TestReadTokenType(t *testing.T) {
 		assert(t, got, want)
 	})
 }
-
-func typeToString(t TokenType) string {
-	switch t {
-	case Ident:
-		return "Ident"
-	case Rparen:
-		return "Rparen"
-	case Lparen:
-		return "Lparen"
-	case Semi:
-		return "Semi-Colon"
-	case Colon:
-		return "Colon"
-	case Comma:
-		return "Comma"
-	case Bslash:
-		return "\\"
-	case Dot:
-		return "."
-	case Hash:
-		return "#"
-	case Bang:
-		return "!"
-	}
-	return "Undefined"
-}
