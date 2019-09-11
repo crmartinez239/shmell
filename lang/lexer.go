@@ -45,6 +45,33 @@ type Token struct {
 	Value []rune
 }
 
+// TypeString returns the string value for TokenType
+func (t *Token) TypeString() string {
+	switch t.Type {
+	case Ident:
+		return "Ident"
+	case Rparen:
+		return "Rparen"
+	case Lparen:
+		return "Lparen"
+	case Semi:
+		return "Semi-Colon"
+	case Colon:
+		return "Colon"
+	case Comma:
+		return "Comma"
+	case Bslash:
+		return "\\"
+	case Dot:
+		return "."
+	case Hash:
+		return "#"
+	case Bang:
+		return "!"
+	}
+	return "Undefined"
+}
+
 func isNewLine(r rune) bool {
 	if r == 10 {
 		return true
