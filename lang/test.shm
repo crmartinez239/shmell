@@ -1,5 +1,5 @@
-!std
-!link(src=fdasf)
+!std;
+!link(src=fdasf);
 
 title My Blog 2.0;
 
