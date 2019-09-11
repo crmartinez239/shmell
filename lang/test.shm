@@ -1,0 +1,13 @@
+!std
+!link(src=fdasf)
+
+title My Blog 2.0;
+
+body
+    h1 Welcome to my page!;
+
+    p(id: main-p)
+        This is a test of my \s.orange(awesome)language!;
+
+
+;
