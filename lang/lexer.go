@@ -37,17 +37,9 @@ const (
 	Undefined
 )
 
-// Token token data structure
-type Token struct {
-	// Type the TokenType of token
-	Type TokenType
-	// Value is the raw token text
-	Value []rune
-}
-
 // TypeString returns the string value for TokenType
-func (t *Token) TypeString() string {
-	switch t.Type {
+func (t TokenType) String() string {
+	switch t {
 	case Ident:
 		return "Ident"
 	case Rparen:
@@ -70,6 +62,14 @@ func (t *Token) TypeString() string {
 		return "!"
 	}
 	return "Undefined"
+}
+
+// Token token data structure
+type Token struct {
+	// Type the TokenType of token
+	Type TokenType
+	// Value is the raw token text
+	Value []rune
 }
 
 func isNewLine(r rune) bool {
