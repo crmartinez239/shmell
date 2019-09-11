@@ -47,7 +47,7 @@ func (t TokenType) String() string {
 	case Lparen:
 		return "Lparen"
 	case Semi:
-		return "Semi-Colon"
+		return "Semi"
 	case Colon:
 		return "Colon"
 	case Comma:
