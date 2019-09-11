@@ -1,7 +1,7 @@
-!std;
-!link(src=fdasf);
+!std
+!link(src=style.css)
 
-title My Blog 2.0;
+title My Blog 2.0 ;
 
 body
     h1 Welcome to my page!;
