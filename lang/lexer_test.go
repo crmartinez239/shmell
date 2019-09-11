@@ -13,7 +13,7 @@ func TestReadTokenType(t *testing.T) {
 	assert := func(t *testing.T, got, want TokenType) {
 		t.Helper()
 		if got != want {
-			t.Errorf("got: %s - want: %s", typeToString(got), typeToString(want))
+			t.Errorf("got: %s - want: %s", got.String(), want.String())
 		}
 	}
 
