@@ -45,6 +45,14 @@ type Token struct {
 	Value []rune
 }
 
+func isNewLine(r rune) bool {
+	if r == 10 {
+		return true
+	}
+
+	return false
+}
+
 func isPreprocessor(r rune) bool {
 	if string(r) == "!" {
 		return true
@@ -53,7 +61,8 @@ func isPreprocessor(r rune) bool {
 }
 
 func isControlOperator(r rune) bool {
-	switch string(r) {
+	str := string(r)
+	switch str {
 	case "(":
 		return true
 	case ")":
@@ -69,8 +78,6 @@ func isControlOperator(r rune) bool {
 	case ".":
 		return true
 	case "#":
-		return true
-	case "!":
 		return true
 	}
 	return false
@@ -146,6 +153,10 @@ func (l *Lexer) ReadToken() *Token {
 		return tokenFromRune(currentRune)
 	}
 
+	if isNewLine(currentRune) {
+		return &Token{EOL, []rune{currentRune}}
+	}
+
 	return &Token{Undefined, []rune{}}
 }
 
@@ -172,5 +183,6 @@ func (l *Lexer) getLetterNumeric() ([]rune, error) {
 		}
 	}
 
+	l.reader.UnreadRune()
 	return str, nil
 }
