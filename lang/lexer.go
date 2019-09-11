@@ -41,17 +41,17 @@ const (
 func (t TokenType) String() string {
 	switch t {
 	case Ident:
-		return "Ident"
+		return "Identifier"
 	case Rparen:
-		return "Rparen"
+		return ")"
 	case Lparen:
-		return "Lparen"
+		return "("
 	case Semi:
-		return "Semi"
+		return ";"
 	case Colon:
-		return "Colon"
+		return ":"
 	case Comma:
-		return "Comma"
+		return ","
 	case Bslash:
 		return "\\"
 	case Dot:
