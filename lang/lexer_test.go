@@ -28,6 +28,18 @@ func TestReadTokenType(t *testing.T) {
 		want := Ident
 		assert(t, got, want)
 	})
+
+	t.Run("Semi token", func(t *testing.T) {
+		got := lexer.ReadToken().Type
+		want := Semi
+		assert(t, got, want)
+	})
+
+	t.Run("EOL token", func(t *testing.T) {
+		got := lexer.ReadToken().Type
+		want := EOL
+		assert(t, got, want)
+	})
 }
 
 func typeToString(t TokenType) string {
