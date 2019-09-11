@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/crmartinez239/lang1/lang"
+	"github.com/crmartinez239/shmell/shm"
 )
 
 func main() {
@@ -13,7 +13,7 @@ func main() {
 		log.Fatal("Invalid number of arguments")
 	}
 
-	lex, err := lang.NewLexer(os.Args[1])
+	lex, err := shm.NewLexer(os.Args[1])
 	if err != nil {
 		log.Fatal(err)
 	}

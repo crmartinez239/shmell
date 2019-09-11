@@ -1,4 +1,4 @@
-package lang
+package shm
 
 // Parser undefined
 type Parser struct {
