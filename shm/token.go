@@ -1,5 +1,21 @@
 package shm
 
+import "strings"
+
+type TagType int
+
+const (
+	None TagType = iota
+	Base
+	Body
+	HTML
+	Link
+	Meta
+	Script
+	Std
+	Title
+)
+
 // TokenType undefined
 type TokenType int
 
@@ -26,6 +42,8 @@ const (
 	Bang
 	// Equal equal sign character
 	Equal
+	//Tag html tag
+	Tag
 	// EOL end-of-line
 	EOL
 	// Undefined is undefined
@@ -65,13 +83,35 @@ func (t TokenType) String() string {
 type Token struct {
 	// Type the TokenType of token
 	Type TokenType
+	Tag  TagType
 	// Value is the raw token text
 	Value []rune
 }
 
-// func tokenFromTag([]rune) *Token {
-
-// }
+func tokenFromTag(r []rune) *Token {
+	var t TagType
+	switch strings.ToLower(string(r)) {
+	case "base":
+		t = Base
+	case "body":
+		t = Body
+	case "html":
+		t = HTML
+	case "link":
+		t = Link
+	case "meta":
+		t = Meta
+	case "script":
+		t = Script
+	case "std":
+		t = Std
+	case "title":
+		t = Title
+	default:
+		t = None
+	}
+	return &Token{Tag, t, r}
+}
 
 func tokenFromRune(r rune) *Token {
 	var t TokenType
@@ -99,5 +139,5 @@ func tokenFromRune(r rune) *Token {
 	default:
 		t = Undefined
 	}
-	return &Token{t, []rune{r}}
+	return &Token{t, None, []rune{r}}
 }

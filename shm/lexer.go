@@ -2,7 +2,6 @@ package shm
 
 import (
 	"bufio"
-	"log"
 	"os"
 	"unicode"
 )
@@ -32,12 +31,12 @@ func (l *Lexer) Close() {
 }
 
 // ReadRuneToken reads the next single rune token from file stream
-func (l *Lexer) ReadRuneToken() *Token {
+func (l *Lexer) ReadRuneToken() (*Token, error) {
 	for {
 		currentRune, _, err := l.reader.ReadRune()
 
 		if err != nil {
-			log.Fatalln(err)
+			return nil, err
 		}
 
 		s := string(currentRune)
@@ -45,32 +44,37 @@ func (l *Lexer) ReadRuneToken() *Token {
 			continue
 		}
 
-		return tokenFromRune(currentRune)
+		return tokenFromRune(currentRune), nil
 	}
 }
 
-// func (l *Lexer) ReadTagToken() *Token {
+func (l *Lexer) ReadTagToken() (*Token, error) {
+	token, err := l.getLetterNumeric()
 
-// }
+	if err != nil {
+		if token == nil {
+			return nil, err
+		}
+	}
+
+	return tokenFromTag(token), nil
+}
 
 // rune slice will start with a unicode character from category L
 // the rest of the slice will be a combination of category L and N
 func (l *Lexer) getLetterNumeric() ([]rune, error) {
 	str := []rune{}
 
-	// first rune has already been verified
-	firstRune, _, _ := l.reader.ReadRune()
-	str = append(str, firstRune)
-
+	l.eatSpace()
 	for {
-		r, _, err := l.reader.ReadRune()
+		currentRune, _, err := l.reader.ReadRune()
 
 		if err != nil {
 			return str, err
 		}
 
-		if unicode.IsLetter(r) || unicode.IsNumber(r) {
-			str = append(str, r)
+		if unicode.IsLetter(currentRune) || unicode.IsNumber(currentRune) {
+			str = append(str, currentRune)
 		} else {
 			break
 		}
@@ -78,4 +82,15 @@ func (l *Lexer) getLetterNumeric() ([]rune, error) {
 
 	l.reader.UnreadRune()
 	return str, nil
+}
+
+func (l *Lexer) eatSpace() {
+	for {
+		r, _, _ := l.reader.ReadRune()
+		space := string(r)
+		if space != " " && space != "\t" {
+			l.reader.UnreadRune()
+			return
+		}
+	}
 }
