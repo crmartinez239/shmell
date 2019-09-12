@@ -1,10 +1,10 @@
 !std
-!link(src=style.css)
+!link rel=stylesheet, href=style.css
+!title My Blog 2.0
 
-title My Blog 2.0 ;
 
-body
-    h1 Welcome to my page!;
+body (
+    h1 Welcome to my page!)
 
     p(id: main-p)
         This is a test of my \s.orange(awesome)language!;

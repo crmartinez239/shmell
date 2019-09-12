@@ -32,6 +32,7 @@ func NewParser(lexer *Lexer) *Parser {
 	return &Parser{lexer, preprocessor}
 }
 
+// Parse parses the current Lexer stream
 func (p *Parser) Parse() error {
 	for {
 		if p.currentState == preprocessor {
