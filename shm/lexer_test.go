@@ -101,4 +101,16 @@ func TestReadRuneToken(t *testing.T) {
 		want := Undefined
 		assert(t, got.Type, want)
 	})
+
+	t.Run("Bang token", func(t *testing.T) {
+		got, _ := lexer.ReadRuneToken()
+		want := Bang
+		assert(t, got.Type, want)
+	})
+
+	t.Run("End of file", func(t *testing.T) {
+		got, _ := lexer.ReadRuneToken()
+		want := EOF
+		assert(t, got.Type, want)
+	})
 }

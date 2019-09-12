@@ -46,6 +46,8 @@ const (
 	Tag
 	// EOL end-of-line
 	EOL
+	//EOF end-of-file
+	EOF
 	// Undefined is undefined
 	Undefined
 )
@@ -75,8 +77,15 @@ func (t TokenType) String() string {
 		return "!"
 	case Equal:
 		return "="
+	case Tag:
+		return "Tag"
+	case EOL:
+		return "EOL"
+	case EOF:
+		return "EOF"
+	default:
+		return "Undefined"
 	}
-	return "Undefined"
 }
 
 // Token token data structure

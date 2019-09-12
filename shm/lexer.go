@@ -36,6 +36,9 @@ func (l *Lexer) ReadRuneToken() (*Token, error) {
 		currentRune, _, err := l.reader.ReadRune()
 
 		if err != nil {
+			if err.Error() == "EOF" {
+				return &Token{EOF, None, []rune{currentRune}}, nil
+			}
 			return nil, err
 		}
 
@@ -48,13 +51,16 @@ func (l *Lexer) ReadRuneToken() (*Token, error) {
 	}
 }
 
+// ReadTagToken attempts to convert getLetterNumeric into a Tag type token.
+// Will return error if there was a problem reading from file.
 func (l *Lexer) ReadTagToken() (*Token, error) {
 	token, err := l.getLetterNumeric()
 
 	if err != nil {
-		if token == nil {
-			return nil, err
+		if err.Error() == "EOF" {
+			return &Token{EOF, None, token}, nil
 		}
+		return nil, err
 	}
 
 	return tokenFromTag(token), nil
@@ -64,13 +70,17 @@ func (l *Lexer) ReadTagToken() (*Token, error) {
 // the rest of the slice will be a combination of category L and N
 func (l *Lexer) getLetterNumeric() ([]rune, error) {
 	str := []rune{}
-
 	l.eatSpace()
+
 	for {
 		currentRune, _, err := l.reader.ReadRune()
 
 		if err != nil {
-			return str, err
+			if len(str) == 0 {
+				return nil, err
+			}
+
+			return str, nil
 		}
 
 		if unicode.IsLetter(currentRune) || unicode.IsNumber(currentRune) {
