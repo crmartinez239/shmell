@@ -31,6 +31,8 @@ const (
 	Hash
 	//Bang exclamtion character
 	Bang
+	// Equal equal sign character
+	Equal
 	// EOL end-of-line
 	EOL
 	// Undefined is undefined
@@ -60,6 +62,8 @@ func (t TokenType) String() string {
 		return "#"
 	case Bang:
 		return "!"
+	case Equal:
+		return "="
 	}
 	return "Undefined"
 }
@@ -72,22 +76,7 @@ type Token struct {
 	Value []rune
 }
 
-func isNewLine(r rune) bool {
-	if r == 10 {
-		return true
-	}
-
-	return false
-}
-
-func isPreprocessor(r rune) bool {
-	if string(r) == "!" {
-		return true
-	}
-	return false
-}
-
-func isControlOperator(r rune) bool {
+func isOperator(r rune) bool {
 	str := string(r)
 	switch str {
 	case "(":
@@ -131,6 +120,10 @@ func tokenFromRune(r rune) *Token {
 		t = Hash
 	case "!":
 		t = Bang
+	case "\n":
+		t = EOL
+	default:
+		t = Undefined
 	}
 	return &Token{t, []rune{r}}
 }
@@ -159,32 +152,22 @@ func (l *Lexer) Close() {
 	l.file.Close()
 }
 
-// ReadToken reads the next token from file stream
-func (l *Lexer) ReadToken() *Token {
-	currentRune, _, err := l.reader.ReadRune()
-	if err != nil {
-		log.Fatalln(err)
-	}
+// ReadRuneToken reads the next single rune token from file stream
+func (l *Lexer) ReadRuneToken() *Token {
+	for {
+		currentRune, _, err := l.reader.ReadRune()
 
-	if isPreprocessor(currentRune) {
-		return &Token{Bang, []rune{currentRune}}
-	}
+		if err != nil {
+			log.Fatalln(err)
+		}
 
-	if unicode.IsLetter(currentRune) {
-		l.reader.UnreadRune()
-		word, _ := l.getLetterNumeric()
-		return &Token{Ident, word}
-	}
+		s := string(currentRune)
+		if s == " " || s == "\t" {
+			continue
+		}
 
-	if isControlOperator(currentRune) {
 		return tokenFromRune(currentRune)
 	}
-
-	if isNewLine(currentRune) {
-		return &Token{EOL, []rune{currentRune}}
-	}
-
-	return &Token{Undefined, []rune{}}
 }
 
 // rune slice will start with a unicode character from category L

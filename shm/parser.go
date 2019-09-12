@@ -9,7 +9,7 @@ const (
 
 // Parser undefined
 type Parser struct {
-	lexer *Lexer,
+	lexer        *Lexer
 	currentState ParserState
 }
 
@@ -18,10 +18,20 @@ func NewParser(lexer *Lexer) *Parser {
 	return &Parser{lexer, Initial}
 }
 
-func (p *Parser) ParsePreprocessor() (error) {
+func (p *Parser) Parse() error {
 	for {
 		if p.currentState == Initial {
-			
+			// Look for preprocessor statements
+			token := p.lexer.ReadToken()
+
+			if token.Type == Bang {
+				p.parsePreprocessorStatement()
+			}
+
 		}
 	}
+}
+
+func (p *Parser) parsePreprocessorStatement() error {
+
 }
