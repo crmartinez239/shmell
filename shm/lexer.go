@@ -8,8 +8,9 @@ import (
 
 // Lexer undefined
 type Lexer struct {
-	file   *os.File
-	reader *bufio.Reader
+	file       *os.File
+	reader     *bufio.Reader
+	unreadable bool
 }
 
 // NewLexer returns a new Lexer stream from fileName.
@@ -20,7 +21,7 @@ func NewLexer(fileName string) (*Lexer, error) {
 		return nil, err
 	}
 	reader := bufio.NewReader(file)
-	l := &Lexer{file, reader}
+	l := &Lexer{file, reader, false}
 	return l, nil
 }
 
@@ -37,6 +38,7 @@ func (l *Lexer) ReadRuneToken() (*Token, error) {
 
 		if err != nil {
 			if err.Error() == "EOF" {
+				l.unreadable = false
 				return &Token{EOF, None, []rune{currentRune}}, nil
 			}
 			return nil, err
@@ -47,23 +49,35 @@ func (l *Lexer) ReadRuneToken() (*Token, error) {
 			continue
 		}
 
+		l.unreadable = true
 		return tokenFromRune(currentRune), nil
 	}
 }
 
-// ReadTagToken attempts to convert getLetterNumeric into a Tag type token.
+// ReadTagToken attempts to read a Tag type token.
 // Will return error if there was a problem reading from file.
 func (l *Lexer) ReadTagToken() (*Token, error) {
 	token, err := l.getLetterNumeric()
+	l.unreadable = false
 
 	if err != nil {
 		if err.Error() == "EOF" {
+
 			return &Token{EOF, None, token}, nil
 		}
 		return nil, err
 	}
 
 	return tokenFromTag(token), nil
+}
+
+// UnreadRune only unreads last rune if it was read by ReadRuneToken.
+// Only once per ReadRuneToken use.
+func (l *Lexer) UnreadRune() {
+	if l.unreadable {
+		l.unreadable = false
+		l.reader.UnreadRune()
+	}
 }
 
 // rune slice will start with a unicode character from category L
