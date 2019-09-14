@@ -51,15 +51,22 @@ func (p *Parser) Parse() error {
 				continue
 			}
 
-			// parseErr := p.parsePreprocessorStatement()
-		}
+			parseErr := p.parsePreprocessorStatement()
 
+			if parseErr != nil {
+				return parseErr
+			}
+
+			break //REMOVE
+		}
 	}
+	return nil
 }
 
 func (p *Parser) parsePreprocessorStatement() error {
 	// ![tag]
 	// ![tag] [attribute] = [value]
+
 	p.lexer.ReadRuneToken() // the Bang token
 	tag, tagErr := p.lexer.ReadTagToken()
 
@@ -78,7 +85,8 @@ func (p *Parser) parsePreprocessorStatement() error {
 		return nil
 	}
 
-	if err := p.parseAttributes(); err != nil {
+	err := p.parseAttributes()
+	if err != nil {
 		return err
 	}
 
@@ -86,6 +94,51 @@ func (p *Parser) parsePreprocessorStatement() error {
 }
 
 func (p *Parser) parseAttributes() error {
+	// [attribute] ,
+	// [attribute] : [value] ,
+	for {
+		attr, attrErr := p.lexer.ReadAttributeToken()
+		if attrErr != nil {
+			return attrErr
+		}
 
+		if attr.Type != Attribute {
+			return &ParserError{"Expected: attribute", attr}
+		}
+
+		runeTkn, runeErr := p.lexer.ReadRuneToken()
+		if runeErr != nil {
+			return runeErr
+		}
+
+		// expect EOL, Comma, Colon
+		if runeTkn.Type == EOL {
+			// AST logic
+			return nil
+		}
+
+		if runeTkn.Type == Comma {
+			// AST logic
+			continue
+		}
+
+		if runeTkn.Type != Colon {
+			return &ParserError{"Expected: end of line", runeTkn}
+		}
+
+		p.parseAttributeValue()
+
+		break
+	}
+	return nil
+}
+
+func (p *Parser) parseAttributeValue() error {
+	// '[value]'
+	// [value]
+	peek, _ := p.lexer.PeekRuneToken()
+	if peek.Type == Quote {
+
+	}
 	return nil
 }
