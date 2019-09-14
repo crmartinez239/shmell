@@ -126,19 +126,32 @@ func (p *Parser) parseAttributes() error {
 			return &ParserError{"Expected: end of line", runeTkn}
 		}
 
-		p.parseAttributeValue()
+		p.getAttributeValue()
 
 		break
 	}
 	return nil
 }
 
-func (p *Parser) parseAttributeValue() error {
+func (p *Parser) getAttributeValue() (*Token, error) {
 	// '[value]'
 	// [value]
 	peek, _ := p.lexer.PeekRuneToken()
 	if peek.Type == Quote {
 
+		value, err := p.lexer.ReadStringValueToken()
+
+		if err != nil {
+			if err.Error() == "mcq" {
+				return nil, &ParserError{"Missing closing quote", nil}
+			}
+			return nil, err
+		}
+
+		return value, nil
 	}
-	return nil
+
+	// value, err := p.lexer.ReadSingleWordValue()
+
+	return nil, nil
 }

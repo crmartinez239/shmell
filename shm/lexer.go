@@ -82,7 +82,7 @@ func (l *Lexer) ReadAttributeToken() (*Token, error) {
 	return &Token{Attribute, None, token}, nil
 }
 
-// ReadStringValueToken reads all text withing quotes and returns the value in a token
+// ReadStringValueToken reads all text withing quotes and returns  	 	the value in a token
 func (l *Lexer) ReadStringValueToken() (*Token, error) {
 	value := []rune{}
 	l.ReadRuneToken()
@@ -91,7 +91,8 @@ func (l *Lexer) ReadStringValueToken() (*Token, error) {
 
 		if err != nil {
 			if err.Error() == "EOF" {
-				return nil, errors.New("Missing closing quote")
+				//Missing closing quote
+				return nil, errors.New("mcq")
 			}
 			return nil, err
 		}
