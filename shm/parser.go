@@ -151,7 +151,7 @@ func (p *Parser) getAttributeValue() (*Token, error) {
 		return value, nil
 	}
 
-	// value, err := p.lexer.ReadSingleWordValue()
+	value, err := p.lexer.ReadWordValueToken()
 
 	return nil, nil
 }

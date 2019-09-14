@@ -85,7 +85,7 @@ func (l *Lexer) ReadAttributeToken() (*Token, error) {
 // ReadStringValueToken reads all text withing quotes and returns  	 	the value in a token
 func (l *Lexer) ReadStringValueToken() (*Token, error) {
 	value := []rune{}
-	l.ReadRuneToken()
+	l.ReadRuneToken() //fist quote
 	for {
 		nextRune, _, err := l.reader.ReadRune()
 
@@ -105,6 +105,30 @@ func (l *Lexer) ReadStringValueToken() (*Token, error) {
 	}
 
 	return &Token{Value, None, value}, nil
+}
+
+func (l *Lexer) ReadWordValueToken() (*Token, error) {
+	value := []rune{}
+	for {
+		nextRune, _, err := l.reader.ReadRune()
+
+		if err != nil {
+			if len(value) != 0 {
+				return &Token{Value, None, value}, nil
+			}
+			if err.Error() == "EOF" {
+				return &Token{EOF, None, nil}, nil
+			}
+			return nil, err
+		}
+
+		checkToken := tokenFromRune(nextRune)
+
+		if unicode.IsSpace(nextRune) {
+			return &Token{Value, None, value}, nil
+		}
+
+	}
 }
 
 // PeekRuneToken attempts to read next signle rune token

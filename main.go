@@ -19,4 +19,6 @@ func main() {
 	}
 	defer lex.Close()
 
+	par := shm.NewParser(lex)
+	par.Parse()
 }
