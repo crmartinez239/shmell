@@ -38,12 +38,14 @@ const (
 	Dot
 	//Hash hash character
 	Hash
-	//Bang exclamtion character
+	// Bang exclamtion character
 	Bang
 	// Equal equal sign character
 	Equal
-	//Tag html tag
+	// Tag html tag
 	Tag
+	// Attribute tag attribute
+	Attribute
 	// EOL end-of-line
 	EOL
 	//EOF end-of-file
@@ -79,6 +81,8 @@ func (t TokenType) String() string {
 		return "="
 	case Tag:
 		return "Tag"
+	case Attribute:
+		return "Attribute"
 	case EOL:
 		return "EOL"
 	case EOF:

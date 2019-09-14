@@ -58,13 +58,27 @@ func (l *Lexer) ReadTagToken() (*Token, error) {
 
 	if err != nil {
 		if err.Error() == "EOF" {
-
 			return &Token{EOF, None, token}, nil
 		}
 		return nil, err
 	}
 
 	return tokenFromTag(token), nil
+}
+
+// ReadAttributeToken reads the next Letter Numeric string and
+// stores it in an Attribute token
+func (l *Lexer) ReadAttributeToken() (*Token, error) {
+	token, err := l.getLetterNumeric()
+
+	if err != nil {
+		if err.Error() == "EOF" {
+			return &Token{EOF, None, token}, nil
+		}
+		return nil, err
+	}
+
+	return &Token{Attribute, None, token}, nil
 }
 
 // PeekRuneToken attempts to read next signle rune token
