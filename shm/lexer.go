@@ -2,6 +2,7 @@ package shm
 
 import (
 	"bufio"
+	"errors"
 	"os"
 	"unicode"
 )
@@ -79,6 +80,30 @@ func (l *Lexer) ReadAttributeToken() (*Token, error) {
 	}
 
 	return &Token{Attribute, None, token}, nil
+}
+
+// ReadStringValueToken reads all text withing quotes and returns the value in a token
+func (l *Lexer) ReadStringValueToken() (*Token, error) {
+	value := []rune{}
+	l.ReadRuneToken()
+	for {
+		nextRune, _, err := l.reader.ReadRune()
+
+		if err != nil {
+			if err.Error() == "EOF" {
+				return nil, errors.New("Missing closing quote")
+			}
+			return nil, err
+		}
+
+		if string(nextRune) != "'" {
+			value = append(value, nextRune)
+		} else {
+			break
+		}
+	}
+
+	return &Token{Value, None, value}, nil
 }
 
 // PeekRuneToken attempts to read next signle rune token

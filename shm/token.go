@@ -26,6 +26,8 @@ const (
 	Rparen
 	// Lparen left parenthesies character ')'
 	Lparen
+	// Quote single quote character
+	Quote
 	// Colon colon character ':'
 	Colon
 	// Semi semi-colon character ';'
@@ -46,6 +48,8 @@ const (
 	Tag
 	// Attribute tag attribute
 	Attribute
+	// Value tag or attribute value
+	Value
 	// EOL end-of-line
 	EOL
 	//EOF end-of-file
@@ -63,6 +67,8 @@ func (t TokenType) String() string {
 		return ")"
 	case Lparen:
 		return "("
+	case Quote:
+		return "'"
 	case Semi:
 		return ";"
 	case Colon:
@@ -133,6 +139,8 @@ func tokenFromRune(r rune) *Token {
 		t = Lparen
 	case ")":
 		t = Rparen
+	case "'":
+		t = Quote
 	case ";":
 		t = Semi
 	case ":":
