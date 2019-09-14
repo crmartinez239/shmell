@@ -9,7 +9,7 @@ title  My Blog 2.0 ;
 body
     h1(cls:'big red') Welcome to my page! ;
 
-    p(class:'button red')
+    p(cls:button, id:red)
         This is a test of my \s.orange(awesome)language!;
 
 
