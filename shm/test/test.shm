@@ -1,12 +1,15 @@
-! std      
-!   link rel=stylesheet, href = style.css
-!title My Blog 2.0
+!std      
+!link rel:stylesheet, href:style.css
+!script src:main.js, defer
 
 
-body (
-    h1 Welcome to my page!)
+title  My Blog 2.0 ;
 
-    p(id: main-p)
+
+body
+    h1(cls:'big red') Welcome to my page! ;
+
+    p(class:'button red')
         This is a test of my \s.orange(awesome)language!;
 
 
