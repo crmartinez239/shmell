@@ -107,6 +107,7 @@ func (l *Lexer) ReadStringValueToken() (*Token, error) {
 	return &Token{Value, None, value}, nil
 }
 
+// ReadWordValueToken reads an attribute value not within quotes
 func (l *Lexer) ReadWordValueToken() (*Token, error) {
 	value := []rune{}
 	for {
@@ -122,12 +123,14 @@ func (l *Lexer) ReadWordValueToken() (*Token, error) {
 			return nil, err
 		}
 
-		checkToken := tokenFromRune(nextRune)
-
-		if unicode.IsSpace(nextRune) {
+		if isBreakRune(nextRune) {
+			if len(value) == 0 {
+				return nil, nil
+			}
 			return &Token{Value, None, value}, nil
 		}
 
+		value = append(value, nextRune)
 	}
 }
 
@@ -176,4 +179,22 @@ func (l *Lexer) eatSpace() {
 			return
 		}
 	}
+}
+
+func isBreakRune(r rune) bool {
+	if unicode.IsSpace(r) {
+		return true
+	}
+
+	check := tokenFromRune(r)
+
+	if check.Type == Comma {
+		return true
+	}
+
+	if check.Type == EOL {
+		return true
+	}
+
+	return false
 }
