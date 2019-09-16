@@ -124,6 +124,7 @@ func (l *Lexer) ReadWordValueToken() (*Token, error) {
 		}
 
 		if isBreakRune(nextRune) {
+			l.reader.UnreadRune()
 			if len(value) == 0 {
 				return nil, nil
 			}
