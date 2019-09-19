@@ -1,2 +1,2 @@
 !std
-!script src:main.js, test:'test1 test2 test3', defer
+!script src : main.js, test : 'test test test'

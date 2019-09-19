@@ -86,6 +86,11 @@ func (p *Parser) parsePreprocessorStatement() error {
 		return nil
 	}
 
+	if peek.Type == EOF {
+		//AST logic
+		return nil
+	}
+
 	err := p.parseAttributes()
 	if err != nil {
 		return err
@@ -132,7 +137,10 @@ func (p *Parser) parseAttributes() error {
 			return &ParserError{"Expected: end of line", runeTkn}
 		}
 
-		p.getAttributeValue()
+		_, err := p.getAttributeValue()
+		if err != nil {
+			return err
+		}
 
 		// expect EOL or Comma
 		lastTkn, err := p.lexer.ReadRuneToken()
@@ -145,6 +153,10 @@ func (p *Parser) parseAttributes() error {
 			continue
 		}
 		if lastTkn.Type == EOL {
+			//AST logic
+			break
+		}
+		if lastTkn.Type == EOF {
 			//AST logic
 			break
 		}
@@ -177,6 +189,10 @@ func (p *Parser) getAttributeValue() (*Token, error) {
 
 	if err != nil {
 		return nil, err
+	}
+
+	if len(value.Value) == 0 {
+		return nil, &ParserError{"Expected: attribute value", value}
 	}
 
 	return value, nil

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -20,5 +21,5 @@ func main() {
 	defer lex.Close()
 
 	par := shm.NewParser(lex)
-	par.Parse()
+	fmt.Printf("Error: %s", par.Parse().Error())
 }
