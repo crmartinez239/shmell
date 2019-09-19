@@ -56,9 +56,10 @@ func (p *Parser) Parse() error {
 			if parseErr != nil {
 				return parseErr
 			}
-
-			break //REMOVE
+			continue
 		}
+
+		break
 	}
 	return nil
 }
@@ -111,9 +112,14 @@ func (p *Parser) parseAttributes() error {
 			return runeErr
 		}
 
-		// expect EOL, Comma, Colon
+		// expect EOL, EOF, Comma, Colon
 		if runeTkn.Type == EOL { // valueless attribute
 			// AST logic
+			return nil
+		}
+
+		if runeTkn.Type == EOF {
+			//AST logic
 			return nil
 		}
 
