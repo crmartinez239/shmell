@@ -19,6 +19,7 @@ type parserState int
 
 const (
 	preprocessor parserState = iota
+	body
 )
 
 // Parser undefined
@@ -48,6 +49,7 @@ func (p *Parser) Parse() error {
 
 			if token.Type != Bang {
 				// Set new parser state
+				p.currentState = body
 				continue
 			}
 
@@ -191,7 +193,7 @@ func (p *Parser) getAttributeValue() (*Token, error) {
 		return nil, err
 	}
 
-	if len(value.Value) == 0 {
+	if len(string(value.Value)) == 0 {
 		return nil, &ParserError{"Expected: attribute value", value}
 	}
 

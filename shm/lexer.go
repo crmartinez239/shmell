@@ -54,7 +54,7 @@ func (l *Lexer) ReadRuneToken() (*Token, error) {
 		}
 
 		if s == "\n" {
-			defer l.newLine()
+			return l.eolToken(), nil
 		}
 
 		return tokenFromRune(currentRune, l.currentLine, l.currentChar), nil
@@ -142,8 +142,15 @@ func (l *Lexer) ReadWordValueToken() (*Token, error) {
 // PeekRuneToken attempts to read next signle rune token
 // but does not remove it from lexer file stream
 func (l *Lexer) PeekRuneToken() (*Token, error) {
+	cLine := l.currentLine
+	cPos := l.currentChar
+
 	tkn, err := l.ReadRuneToken()
 	l.reader.UnreadRune()
+
+	l.currentLine = cLine
+	l.currentChar = cPos
+
 	return tkn, err
 }
 
@@ -187,6 +194,12 @@ func (l *Lexer) eatSpace() {
 			return
 		}
 	}
+}
+
+func (l *Lexer) eolToken() *Token {
+	nl := &Token{EOL, None, nil, l.currentLine, l.currentChar}
+	l.newLine()
+	return nl
 }
 
 func (l *Lexer) eofToken() *Token {

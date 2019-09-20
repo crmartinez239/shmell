@@ -105,8 +105,16 @@ type Token struct {
 	Tag  TagType
 	// Value is the raw token text
 	Value    []rune
-	Line     uint
-	Position uint
+	line     uint
+	position uint
+}
+
+func (t *Token) Line() uint {
+	return t.line
+}
+
+func (t *Token) Position() uint {
+	return t.position
 }
 
 func tokenFromTag(r []rune, line uint, position uint) *Token {
