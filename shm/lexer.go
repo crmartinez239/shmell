@@ -9,8 +9,10 @@ import (
 
 // Lexer undefined
 type Lexer struct {
-	file   *os.File
-	reader *bufio.Reader
+	file        *os.File
+	reader      *bufio.Reader
+	currentLine uint
+	currentChar uint
 }
 
 // NewLexer returns a new Lexer stream from fileName.
@@ -21,8 +23,13 @@ func NewLexer(fileName string) (*Lexer, error) {
 		return nil, err
 	}
 	reader := bufio.NewReader(file)
-	l := &Lexer{file, reader}
+	l := &Lexer{file, reader, 1, 1}
 	return l, nil
+}
+
+func (l *Lexer) newLine() {
+	l.currentChar = 1
+	l.currentLine++
 }
 
 // Close closes the lexer stream and frees memory.
@@ -35,12 +42,10 @@ func (l *Lexer) Close() {
 func (l *Lexer) ReadRuneToken() (*Token, error) {
 	for {
 		currentRune, _, err := l.reader.ReadRune()
+		l.currentChar++
 
 		if err != nil {
-			if err.Error() == "EOF" {
-				return &Token{EOF, None, []rune{currentRune}}, nil
-			}
-			return nil, err
+			return l.checkEOF(err)
 		}
 
 		s := string(currentRune)
@@ -48,38 +53,36 @@ func (l *Lexer) ReadRuneToken() (*Token, error) {
 			continue
 		}
 
-		return tokenFromRune(currentRune), nil
+		if s == "\n" {
+			defer l.newLine()
+		}
+
+		return tokenFromRune(currentRune, l.currentLine, l.currentChar), nil
 	}
 }
 
 // ReadTagToken attempts to read a Tag type token.
 // Will return error if there was a problem reading from file.
 func (l *Lexer) ReadTagToken() (*Token, error) {
-	token, err := l.getLetterNumeric()
+	tkn, err := l.getLetterNumeric()
 
 	if err != nil {
-		if err.Error() == "EOF" {
-			return &Token{EOF, None, token}, nil
-		}
-		return nil, err
+		return l.checkEOF(err)
 	}
 
-	return tokenFromTag(token), nil
+	return tokenFromTag(tkn, l.currentLine, l.currentChar), nil
 }
 
 // ReadAttributeToken reads the next Letter Numeric string and
 // stores it in an Attribute token
 func (l *Lexer) ReadAttributeToken() (*Token, error) {
-	token, err := l.getLetterNumeric()
+	tkn, err := l.getLetterNumeric()
 
 	if err != nil {
-		if err.Error() == "EOF" {
-			return &Token{EOF, None, token}, nil
-		}
-		return nil, err
+		return l.checkEOF(err)
 	}
 
-	return &Token{Attribute, None, token}, nil
+	return &Token{Attribute, None, tkn, l.currentLine, l.currentChar}, nil
 }
 
 // ReadStringValueToken reads all text withing quotes and returns  	 	the value in a token
@@ -88,7 +91,7 @@ func (l *Lexer) ReadStringValueToken() (*Token, error) {
 	l.ReadRuneToken() //fist quote
 	for {
 		nextRune, _, err := l.reader.ReadRune()
-
+		l.currentChar++
 		if err != nil {
 			if err.Error() == "EOF" {
 				//Missing closing quote
@@ -104,7 +107,7 @@ func (l *Lexer) ReadStringValueToken() (*Token, error) {
 		}
 	}
 
-	return &Token{Value, None, value}, nil
+	return &Token{Value, None, value, l.currentLine, l.currentChar}, nil
 }
 
 // ReadWordValueToken reads an attribute value not within quotes
@@ -112,23 +115,24 @@ func (l *Lexer) ReadWordValueToken() (*Token, error) {
 	value := []rune{}
 	for {
 		nextRune, _, err := l.reader.ReadRune()
-
+		l.currentChar++
 		if err != nil {
 			if len(value) != 0 {
-				return &Token{Value, None, value}, nil
+				return tokenFromValue(value, l.currentLine, l.currentChar), nil
 			}
 			if err.Error() == "EOF" {
-				return &Token{EOF, None, nil}, nil
+				return l.eofToken(), nil
 			}
 			return nil, err
 		}
 
-		if isBreakRune(nextRune) {
+		if l.isBreakRune(nextRune) {
 			l.reader.UnreadRune()
+			l.currentChar--
 			if len(value) == 0 {
 				return nil, nil
 			}
-			return &Token{Value, None, value}, nil
+			return tokenFromValue(value, l.currentLine, l.currentChar), nil
 		}
 
 		value = append(value, nextRune)
@@ -151,7 +155,7 @@ func (l *Lexer) getLetterNumeric() ([]rune, error) {
 
 	for {
 		currentRune, _, err := l.reader.ReadRune()
-
+		l.currentChar++
 		if err != nil {
 			if len(str) == 0 {
 				return nil, err
@@ -163,31 +167,45 @@ func (l *Lexer) getLetterNumeric() ([]rune, error) {
 		if unicode.IsLetter(currentRune) || unicode.IsNumber(currentRune) {
 			str = append(str, currentRune)
 		} else {
-			break
+			l.reader.UnreadRune()
+			l.currentChar--
+			return str, nil
 		}
 	}
 
-	l.reader.UnreadRune()
-	return str, nil
 }
 
 func (l *Lexer) eatSpace() {
 	for {
 		r, _, _ := l.reader.ReadRune()
+		l.currentChar++
 		space := string(r)
+
 		if space != " " && space != "\t" {
 			l.reader.UnreadRune()
+			l.currentChar--
 			return
 		}
 	}
 }
 
-func isBreakRune(r rune) bool {
+func (l *Lexer) eofToken() *Token {
+	return &Token{EOF, None, nil, l.currentLine, l.currentChar}
+}
+
+func (l *Lexer) checkEOF(err error) (*Token, error) {
+	if err.Error() == "EOF" {
+		return l.eofToken(), nil
+	}
+	return nil, err
+}
+
+func (l *Lexer) isBreakRune(r rune) bool {
 	if unicode.IsSpace(r) {
 		return true
 	}
 
-	check := tokenFromRune(r)
+	check := tokenFromRune(r, l.currentLine, l.currentChar)
 
 	if check.Type == Comma {
 		return true

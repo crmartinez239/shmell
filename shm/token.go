@@ -104,12 +104,15 @@ type Token struct {
 	Type TokenType
 	Tag  TagType
 	// Value is the raw token text
-	Value []rune
+	Value    []rune
+	Line     uint
+	Position uint
 }
 
-func tokenFromTag(r []rune) *Token {
+func tokenFromTag(r []rune, line uint, position uint) *Token {
 	var t TagType
-	switch strings.ToLower(string(r)) {
+	str := strings.ToLower(string(r))
+	switch str {
 	case "base":
 		t = Base
 	case "body":
@@ -129,10 +132,10 @@ func tokenFromTag(r []rune) *Token {
 	default:
 		t = None
 	}
-	return &Token{Tag, t, r}
+	return &Token{Tag, t, r, line, position - uint(len(str))}
 }
 
-func tokenFromRune(r rune) *Token {
+func tokenFromRune(r rune, line uint, position uint) *Token {
 	var t TokenType
 	switch string(r) {
 	case "(":
@@ -160,5 +163,9 @@ func tokenFromRune(r rune) *Token {
 	default:
 		t = Undefined
 	}
-	return &Token{t, None, []rune{r}}
+	return &Token{t, None, []rune{r}, line, position - 1}
+}
+
+func tokenFromValue(value []rune, line uint, position uint) *Token {
+	return &Token{Value, None, value, line, position - uint(len(value))}
 }
