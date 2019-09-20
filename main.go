@@ -18,8 +18,17 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer lex.Close()
+	//	defer lex.Close()
 
 	par := shm.NewParser(lex)
-	fmt.Printf("Error: %s", par.Parse().Error())
+	pErr := par.Parse()
+	if pErr != nil {
+		switch e := pErr.(type) {
+
+		case *shm.ParserError:
+			fmt.Printf("Error: %d:%d - %s\n", e.Token().Line(), e.Token().Position(), e)
+			return
+		}
+	}
+	fmt.Println("BOOM!")
 }
